@@ -1,52 +1,68 @@
 # Challan
 
-WhatsApp quote → GST tax invoice. Built to take the first rupee this week on **₹0 budget**.
+WhatsApp quote → GST tax invoice. First rupee this week on **₹0 budget**. No Razorpay.
 
-## Zero-budget stack
+## How money + admin works
 
-- Next.js + Tailwind v4 (Vercel free)
-- Parser + invoice pad run in the browser
-- Pay on UPI (no Stripe, no Razorpay fee to start)
-- Data stays in `localStorage`
+```
+Customer                    Your UPI app                 /admin desk
+   |                              |                           |
+   |-- pays ₹1,999 -------------->|                           |
+   |-- submits name/phone/UTR -------------------------------->| Waiting
+   |                              |-- you see the credit      |
+   |                              |                           | type action password
+   |                              |                           | Approve
+   |<-- Check my payment -------------------------------------| paid + unlock code
+   |-- /make unlocked
+```
+
+1. Customer pays **your UPI** (GPay / PhonePe). No Razorpay, no card fee.
+2. They send name, email, phone, UTR on `/founding`.
+3. You open `/admin`, see the user, confirm the rupees in your UPI app.
+4. Type `ADMIN_ACTION_PASSWORD`, click **Approve**.
+5. They tap **Check my payment**. The invoice pad unlocks.
+
+Login uses `ADMIN_EMAIL` + `ADMIN_PASSWORD` from env.  
+Approve / reject uses `ADMIN_ACTION_PASSWORD` from env.  
+Session is an **httpOnly, SameSite=strict** cookie signed with `ADMIN_SECRET`.  
+`/admin` is noindex and not in the sitemap.
 
 ## Run
 
 ```bash
 cp .env.example .env.local
-# put your UPI and WhatsApp number
+# set UPI + admin email/password/secret
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000) and [http://localhost:3000/admin](http://localhost:3000/admin).
 
-## Vercel (free host)
+## Vercel env
 
-Import this GitHub repo in Vercel. Framework: Next.js. Set:
-
-| Env | Example |
+| Env | What it does |
 | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | `https://your-app.vercel.app` |
-| `NEXT_PUBLIC_UPI_ID` | `yourname@oksbi` |
-| `NEXT_PUBLIC_UPI_NAME` | `Challan` |
-| `NEXT_PUBLIC_WHATSAPP` | `91XXXXXXXXXX` |
+| `NEXT_PUBLIC_SITE_URL` | Canonical + sitemap URL |
+| `NEXT_PUBLIC_UPI_ID` | Your collect UPI |
+| `NEXT_PUBLIC_UPI_NAME` | Name on the UPI QR |
+| `NEXT_PUBLIC_WHATSAPP` | Optional WhatsApp |
 | `NEXT_PUBLIC_FOUNDING_PRICE` | `1999` |
+| `ADMIN_EMAIL` | Admin login email |
+| `ADMIN_PASSWORD` | Admin login password |
+| `ADMIN_SECRET` | 32+ random chars, signs the cookie |
+| `ADMIN_ACTION_PASSWORD` | Required to approve/reject |
+| `STORE_GITHUB_REPO` | Optional: `dubessix/Now-test-` so claims persist on Vercel |
+| `STORE_GITHUB_TOKEN` | Optional: GitHub token with `contents:write` |
 
-SEO is on from the first deploy: `sitemap.xml`, `robots.txt`, canonical URLs, Open Graph image, JSON-LD (`SoftwareApplication` + `FAQPage` + `Organization`), and `manifest.webmanifest`. After go-live, paste the production URL into Google Search Console.
-
-## Earn this week
-
-1. Put your UPI on `/founding` (or in `.env.local`).
-2. Make one sample invoice on `/make`.
-3. Follow `SALES.md` — 30 WhatsApp / walk-ins a day.
-4. First 50 founding seats at ₹1,999 = up to ₹99,950 before you pay for anything.
+Locally, claims save to `data/challan.json` (gitignored). On Vercel the disk is empty each deploy — set the GitHub store env so the desk remembers users.
 
 ## Pages
 
 | Path | Job |
 | --- | --- |
-| `/` | Landing + sample GST pad |
-| `/make` | Paste chat → invoice → print/PDF / WhatsApp |
-| `/founding` | UPI QR + unlock |
-| `/pricing` | Free / founding / public |
+| `/` | Landing |
+| `/make` | Invoice pad |
+| `/founding` | UPI + claim form |
+| `/pricing` | Prices |
+| `/admin` | Watch users, approve after payment |
 
 Not a GST return filer. Your CA still files.

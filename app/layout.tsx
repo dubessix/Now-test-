@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { Suspense } from "react";
+import { Chrome } from "@/components/chrome";
 import { plexMono, plexSans, plexSerif } from "@/lib/fonts";
 import { site } from "@/lib/config";
 import "./globals.css";
@@ -64,9 +64,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${plexSans.variable} ${plexSerif.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-paper font-sans text-ink">
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
+        <Suspense>
+          <Chrome>
+            <main className="flex-1">{children}</main>
+          </Chrome>
+        </Suspense>
       </body>
     </html>
   );
