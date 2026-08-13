@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-plex-sans), "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-plex-serif), "IBM Plex Serif", ui-serif, Georgia, serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, monospace;
+
+  --color-ink: #0b1c2c;
+  --color-carbon: #1e3a5f;
+  --color-carbon-mid: #2b4c7e;
+  --color-paper: #e7edf3;
+  --color-sheet: #f7fafc;
+  --color-rule: #b7c5d4;
+  --color-stamp: #c41e3a;
+  --color-paid: #1f6b3a;
+  --color-mute: #4a5d73;
+}
+
+html,
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: #c41e3a;
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-stamp);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media print {
+  body {
+    background: white !important;
+  }
+
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+
+  .print-sheet {
+    box-shadow: none !important;
+    border: 1px solid #111 !important;
+    width: 100% !important;
+  }
+}
